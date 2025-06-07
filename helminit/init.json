@@ -1,0 +1,8 @@
+{
+    "SERVICE_NAME": "tixia-backend-cron",
+    "DEPLOYMENT": "tixia-backend-cron",
+    "PROJECT": "tixia",
+    "PORT": "3014",
+    "PORT2": "50064",
+    "CHARTNAME": "chartgov2"
+}

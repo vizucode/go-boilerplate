@@ -1,0 +1,292 @@
+syntax = "proto3";
+
+package server;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "gitlab.com/tixia-backend/go-boilerplate/client";
+
+// Service Definitions
+service FlightResponse {
+    rpc FlightSchedule(ScheduleRequest) returns (ScheduleResponse);
+    rpc FlightPrice(FlightPriceRequest) returns (FlightPriceResponse);
+    rpc FlightBooking(FlightPriceRequest) returns (FlightBookResponse);
+    rpc FlightCancelBooking(RequestAfterBook) returns (RequestAfterBook);
+    rpc FlightTicketing(RequestAfterBook) returns (RequestAfterBook);
+    rpc FlightHistories(RequestAfterBook) returns (FlightHistoryResponse);
+    rpc CheckProvider(google.protobuf.Empty) returns (ResponseCheckProvider);
+    rpc GetInsurance(RequestFlightInsurance) returns (ResponseFlightInsurance);
+}
+
+message RequestFlightInsurance {
+    int32 PaxAdult = 1;
+    int32 PaxChild = 2;
+    int32 PaxInfant = 3;
+    repeated DataFlightJourney FlightSegments = 4;
+}
+
+message ResponseFlightInsurance{
+    string Id = 1;
+    string ProviderName = 2;
+    string PackageName = 3; 
+    DataInsuranceFare Fare = 4;
+    string Unit = 5;
+
+    repeated InsuranceCoverage Coverage = 6;
+}
+
+message InsuranceCoverage {
+    string Description = 1;
+    repeated string Terms = 2;
+}
+
+message DataInsuranceFare {
+    double Ntsa = 2;
+    double TicketPrice = 3;
+}
+
+
+message ResponseCheckProvider {
+    string ProviderId = 1;
+    string ProviderName = 2;
+}
+
+message ScheduleRequest {
+    int32 PaxChild = 1;
+    int32 PaxAdult = 2;
+    int32 PaxInfant = 3;
+    string AirlineCode = 4;
+    string OriginCode = 5;
+    string DestinationCode = 6;
+    string DepartureDate = 7;
+    string ReturnDate = 8;
+    bool IsCheapest = 9;
+    string Cabin = 10;
+    string UserId  = 11;
+}
+
+message ScheduleResponse {
+    string SearchId = 1;
+    repeated DataScheduleResponse Departure = 2;
+    repeated DataScheduleResponse Return = 3;
+    bool IsMergedDepartureReturn = 4;
+} 
+
+message DataScheduleResponse {
+    bool ConnectingTroughFare = 1;
+    string DurationHour = 2;
+    string DurationMinute = 3;
+    string DayChange = 4;
+    string AirlineCode = 5;
+    repeated DataFlightJourney Segment = 6;
+    repeated DataClassGroup ClassGroup = 7;
+    repeated MergedSchedule MergedSchedule = 8;
+    string ScheduleId = 9;
+}
+
+message MergedSchedule {
+    repeated DataJourneyMergedSchedule Journeys = 1; // filled by flight journey
+    repeated DataClassMergedSchedule Classes = 2;
+    bool IsDeparture = 3;
+    string TotalDepartureHour = 4;
+    string TotalDepartureMinute = 5;
+    string DepartureAt = 6;
+    string ArrivalAt = 7;
+}
+
+message DataJourneyMergedSchedule {
+    string JourneyId = 1;
+    string DepartureCode = 2;
+    string ArrivalCode = 3;
+    string DepartureAt = 4;
+    string ArrivalAt = 5;
+    string DurationHour = 6;
+    string DurationMinute = 7;
+    string AirlineName = 8;
+    string AirlineCode = 9;
+    string AircraftType = 10;
+    string StopOver = 11;
+}
+
+message DataClassMergedSchedule {
+    string JourneyId = 1;
+    string Cabin = 2;
+    string ClassCode = 3;
+    string BagsKilo = 4;
+    string BagsQty = 5;
+}
+
+message DataFlightJourney {
+    string FlightNo = 1;
+    string OriginCode = 2;
+    string DestinationCode = 3;
+    string DurationHour = 4;
+    string DurationMinute = 5;
+    string DepartDateTime = 6;
+    string ArriveDateTime = 7;
+    string StopOver = 8;
+    bool Meal = 9;
+    string ClassCode = 10; // Is used flight booking
+    string AirlineCode = 11;
+    int32 BaggageKilo = 12;
+    string SegmentId = 13;
+    string OperatingAirline = 14;
+    DetailAirport DetailDeparture = 15;
+    DetailAirport DetailArrival   = 16;
+    int32 JourneyNum = 17;
+    int32 TransitDuration = 18;
+    string AircraftType = 19;
+    string ClassId = 20;
+    int32 JourneyDuration = 21;
+}
+
+message DetailAirport {
+    string Iata = 1;
+    string Name = 2;
+    string City = 3;
+    string Country = 4;
+    int32 Timezone = 5;
+}
+
+message DataClassGroup {
+    repeated DataSubClass SubClass = 1;
+    string SegementId  = 2;
+}
+
+message DataSubClass {
+    string ClassCode = 1;
+    int32 RemainCabin = 2;
+    double NetAgentPrice = 3;
+    double TotalPrice = 4;
+    string CabinCategory = 5;
+    double AdminFee = 6;
+    int32 BaggageKilos = 7;
+    double PercentAdminFee = 8;
+    double NominalAdminFee = 9;
+    bool Meal = 11;
+    string ClassId = 12;
+}
+
+message FlightPriceRequest {
+    repeated DataFlightJourney Departure = 1; 
+    repeated DataFlightJourney Return = 2;
+    int32 PaxChild = 3;
+    int32 PaxAdult = 4;
+    int32 PaxInfant = 5;
+    bool Insurance = 6;
+    string DepartureAirline = 7;
+    string ReturnAirline = 8;
+    bool InternationalFlight = 9;
+    DataContact DataContact = 10;
+    DataAgentContact AgentContact = 11;
+    string UserId = 12;
+    repeated DataPassenger Passangers = 13;
+    bool DepartureConnectingThroughfare = 14;
+    bool ReturnConnectingThroughfare = 15;
+    string SearchId = 16;
+    string FareId = 17;
+    string InsuranceId = 18;
+    string ScheduleId = 19;
+}
+
+message FlightPriceResponse {
+    double GrandTotalPrice = 1;
+    double Insurance = 2;
+    double AdminFee = 3;
+    double TotalOrderPrice = 4;
+    double TotalTax = 5;
+    double TotalOrderWithMarkup = 6;
+    double TotalAdultFare = 7;
+    double TotalChildFare = 8;
+    double TotalInfantFare = 9;
+    repeated FlightDetailPrice FlightDetailPrice = 10;
+    bool IsInternational = 11;
+    repeated DataFlightJourney SegmentFlight = 12;
+    string FareId = 13;
+}
+
+message FlightDetailPrice {
+    string MarketingCode = 1;
+    double AdultFare = 2;
+    double ChildFare = 3;
+    double InfantFare = 4;
+    double TotalFare = 5;
+}
+
+message DataContact {
+    string FirstName = 1;
+    string LastName = 2;
+    string PhoneNumber = 3;
+    string IssuranceNumber = 4;
+    string EmailAddress = 5;
+}
+
+message DataAgentContact {
+    string FirstName = 1;
+    string Lastname = 2;
+    string EmailAddress = 3;
+    string Phone = 4;
+}
+
+message DataPassenger {
+    string Title = 1;
+    string FirstName = 2;
+    string LastName = 3;
+    string Type = 4;
+    string KtpId = 5;
+    string DOB = 6;
+    string AdultAssoc = 7;
+    DataPassport Passport = 8;
+    string TicketNo = 9;
+    string PassengerNo = 10;
+}
+
+message DataPassport {
+    string Number = 1;
+    string Nationality = 2;
+    string IssuingCountry = 3;
+    string Expiry = 4;
+}
+
+message FlightBookResponse {
+    string DeparturePnrId = 1;
+    string ReturnPnrId = 2;
+    double DepartureNetAgentPrice = 3;
+    double ReturnNetAgentPrice = 4;
+    double DepartAdminFee = 5;
+    double ReturnAdminFee = 6;
+    double TotalDeparturePrice = 7;
+    double TotalReturnPrice = 8;
+    double TotalOrderPublishPrice = 9;
+    double DeparturePublishAgentPrice = 10;
+    double ReturnPublishAgentPrice = 11;
+    double TotalOrderWithAdminFee = 12;
+    string BookingResponseMessage = 13;
+    string BookingResponseCode = 14;
+    double TotalOrderWithTax = 15;
+    double TotalTax = 16;
+    double Ntsa = 17;
+    double Commision = 18;
+    double TotalFare = 19;
+    double TotalOrderPriceWithoutInsurance = 20;
+    string BookingId = 21;
+}
+
+message RequestAfterBook {
+    string PnrId = 1;
+    string UserId = 2;
+    string BookingId = 3;
+}
+
+message FlightHistoryResponse {
+    string BookingCode = 1;
+    string ExpiredBooking = 2;
+    string Status = 3;
+    double NetAgentPrice = 4;
+    double TotalPrice = 5;
+    double TotalInsurancePrice = 6;
+    double NetAgentInsurancePrice = 7;
+    repeated DataPassenger Passanger = 8;
+    repeated DataFlightJourney SegmentFlight = 9;
+    string BookingId = 10;
+}
