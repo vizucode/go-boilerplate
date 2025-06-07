@@ -8,17 +8,19 @@ import (
 	"gitlab.com/tixia-backend/go-boilerplate/apps/router/cmd"
 	"gitlab.com/tixia-backend/go-boilerplate/apps/service/transaction"
 	errorhandler "gitlab.com/tixia-backend/go-boilerplate/helpers/error_handler"
-	"k8s.io/utils/env"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/vizucode/gokit/adapter/dbc"
+	"github.com/vizucode/gokit/config"
 	"github.com/vizucode/gokit/utils/constant"
+	"github.com/vizucode/gokit/utils/env"
 )
 
 func main() {
 
 	var serviceName = "CronJob"
+	config.Load(serviceName, ".")
 
 	/*
 		Library
